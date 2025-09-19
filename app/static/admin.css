@@ -57,3 +57,25 @@
 .search-result button:hover {
     background: #218838;
 }
+
+
+
+/* Добавьте в стили */
+.image-attachment {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.file-info {
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+}
+
+.message.own .image-attachment {
+    text-align: right;
+}
+
+.message.other .image-attachment {
+    text-align: left;
+}

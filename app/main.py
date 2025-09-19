@@ -568,6 +568,97 @@ def get_all_users(
 
 
 
+@app.post("/files/", response_model=schemas.FileResponse)
+async def upload_file(
+    file: schemas.FileCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user_override)
+):
+    receiver = crud.get_user_by_username(db, username=file.receiver_username)
+    if not receiver:
+        raise HTTPException(status_code=404, detail="Receiver not found")
+
+    # Валидация подписи
+    is_signature_valid = security.verify_signature(
+        file.encrypted_data,
+        file.signature,
+        current_user.public_key
+    )
+
+    if not is_signature_valid:
+        raise HTTPException(status_code=400, detail="Invalid file signature")
+
+    # Сохраняем файл
+    db_file = crud.create_file(
+        db=db,
+        file_data=file,
+        sender_id=current_user.id,
+        receiver_id=receiver.id
+    )
+
+    # Уведомляем получателя через WebSocket
+    await notify_new_file(db_file, db)
+
+    return {
+        **db_file.__dict__,
+        "download_url": f"/files/download/{db_file.id}"
+    }
+
+@app.get("/files/download/{file_id}")
+async def download_file(
+    file_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user_override)
+):
+    file = crud.get_file_by_id(db, file_id)
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    # Проверяем права доступа
+    if file.sender_id != current_user.id and file.receiver_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    return {
+        "filename": file.filename,
+        "file_type": file.file_type,
+        "encrypted_data": file.encrypted_data,
+        "encrypted_key": file.encrypted_key,
+        "iv": file.iv,
+        "signature": file.signature
+    }
+
+@app.get("/files/conversation/{username}", response_model=List[schemas.FileResponse])
+async def get_conversation_files(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user_override)
+):
+    other_user = crud.get_user_by_username(db, username)
+    if not other_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    files = crud.get_conversation_files(db, current_user.id, other_user.id)
+    return files
+
+# Функция для уведомления о новом файле через WebSocket
+async def notify_new_file(file: models.File, db: Session):
+    file_data = {
+        "type": "new_file",
+        "file": {
+            "id": file.id,
+            "filename": file.filename,
+            "file_type": file.file_type,
+            "file_size": file.file_size,
+            "sender_id": file.sender_id,
+            "receiver_id": file.receiver_id,
+            "timestamp": file.timestamp.isoformat(),
+            "download_url": f"/files/download/{file.id}"
+        }
+    }
+
+    await manager.send_personal_message(file_data, file.sender_id)
+    await manager.send_personal_message(file_data, file.receiver_id)
+
 
 
 

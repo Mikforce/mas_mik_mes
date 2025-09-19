@@ -113,3 +113,6 @@ async def notify_message_read(user_id: int, sender_id: int, db: Session):
         }
     }
     await manager.send_personal_message(message_data, sender_id)
+
+
+

@@ -31,3 +31,23 @@ class Message(Base):
 
     sender = relationship("User", back_populates="sent_messages", foreign_keys=[sender_id])
     receiver = relationship("User", back_populates="received_messages", foreign_keys=[receiver_id])
+
+class File(Base):
+    __tablename__ = "files"
+
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String)
+    file_type = Column(String)  # 'image', 'document', etc.
+    file_size = Column(Integer)
+    encrypted_data = Column(Text)  # Base64 encoded encrypted file data
+    encrypted_key = Column(Text)  # Encrypted AES key
+    iv = Column(Text)  # Initialization vector
+    signature = Column(Text)
+    sender_id = Column(Integer, ForeignKey("users.id"))
+    receiver_id = Column(Integer, ForeignKey("users.id"))
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    message_id = Column(Integer, ForeignKey("messages.id"), nullable=True)  # Optional link to message
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
+    message = relationship("Message", backref="attachments")

@@ -139,3 +139,37 @@ def mark_messages_as_read(db: Session, user_id: int, sender_id: int):
         models.Message.is_read == False
     ).update({"is_read": True})
     db.commit()
+
+
+
+def create_file(db: Session, file_data: schemas.FileCreate, sender_id: int, receiver_id: int):
+    db_file = models.File(
+        filename=file_data.filename,
+        file_type=file_data.file_type,
+        file_size=file_data.file_size,
+        encrypted_data=file_data.encrypted_data,
+        encrypted_key=file_data.encrypted_key,
+        iv=file_data.iv,
+        signature=file_data.signature,
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        message_id=file_data.message_id
+    )
+    db.add(db_file)
+    db.commit()
+    db.refresh(db_file)
+    return db_file
+
+def get_file_by_id(db: Session, file_id: int):
+    return db.query(models.File).filter(models.File.id == file_id).first()
+
+def get_user_files(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.File).filter(
+        (models.File.sender_id == user_id) | (models.File.receiver_id == user_id)
+    ).offset(skip).limit(limit).all()
+
+def get_conversation_files(db: Session, user1_id: int, user2_id: int):
+    return db.query(models.File).filter(
+        ((models.File.sender_id == user1_id) & (models.File.receiver_id == user2_id)) |
+        ((models.File.sender_id == user2_id) & (models.File.receiver_id == user1_id))
+    ).all()

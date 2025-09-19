@@ -96,4 +96,61 @@ class UnreadCount(BaseModel):
     total: int
     by_conversation: Dict[str, int] = {}
 
+
+
+
+
+
+class FileBase(BaseModel):
+    filename: str
+    file_type: str
+    file_size: int
+
+class FileCreate(BaseModel):
+    filename: str
+    file_type: str
+    file_size: int
+    encrypted_data: str
+    encrypted_key: str
+    iv: str
+    signature: str
+    receiver_username: str
+    message_id: Optional[int] = None  # Optional link to message
+
+class FileResponse(FileBase):
+    id: int
+    sender_id: int
+    receiver_id: int
+    timestamp: datetime
+    download_url: str  # URL для скачивания
+
+    class Config:
+        from_attributes = True
+
+# Обновите Message модель для поддержки файлов
+class Message(BaseModel):
+    id: int
+    sender_id: int
+    receiver_id: int
+    encrypted_text: str
+    encrypted_key: str
+    iv: str
+    signature: str
+    timestamp: datetime
+    sender: "User"
+    receiver: "User"
+    attachments: List[FileResponse] = []  # Добавьте это поле
+
+    class Config:
+        from_attributes = True
+
+
+
+
+
+
+
+
+
+
 Message.update_forward_refs()
