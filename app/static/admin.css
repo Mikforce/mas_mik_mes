@@ -1,0 +1,59 @@
+/* Кастомизация админ-панели */
+:root {
+    --primary: #4f46e5;
+    --secondary: #6366f1;
+    --accent: #10b981;
+}
+
+/* Заголовок */
+.sqladmin-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+/* Кнопки */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+/* Навигация */
+.nav-pills .nav-link.active {
+    background-color: var(--primary);
+}
+
+/* Таблицы */
+.table th {
+    background-color: #f8f9fa;
+    color: var(--primary);
+}
+
+/* Карточки */
+.card-header {
+    background-color: var(--primary);
+    color: white;
+}
+
+.search-result {
+    transition: background-color 0.2s;
+}
+
+.search-result:hover {
+    background-color: #f0f0f0;
+}
+
+.search-result button {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.search-result button:hover {
+    background: #218838;
+}
