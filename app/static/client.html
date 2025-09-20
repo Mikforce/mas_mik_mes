@@ -1517,7 +1517,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1525,6 +1524,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Family Messenger</title>
     <style>
+        /* Ваши стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -1772,6 +1772,49 @@
 
         .message.other .message-status {
             color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Новые стили для отображения файлов */
+        .file-message {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .download-btn:hover {
+            background: #218838;
         }
     </style>
 </head>
@@ -2390,7 +2433,7 @@
         async function uploadFile() {
             if (!currentFile || !currentConversation) {
                 alert('Выберите файл и получателя');
-                return;
+                return null;
             }
 
             try {
@@ -2434,12 +2477,12 @@
                 // Очищаем выбранный файл
                 removeFile();
 
-                // Уведомляем пользователя
-                alert('Файл успешно отправлен!');
+                return fileResponse;
 
             } catch (error) {
                 console.error('Ошибка при отправке файла:', error);
                 alert('Ошибка отправки файла: ' + error.message);
+                return null;
             }
         }
 
@@ -2481,287 +2524,60 @@
             const text = document.getElementById('message-text').value;
             const sendButton = document.getElementById('send-button');
 
-            // Если есть файл, отправляем его вместо текста
-            if (currentFile) {
-                sendButton.innerHTML = '<span class="loading"></span>';
-                sendButton.disabled = true;
-
-                try {
-                    await uploadFile();
-                } catch (error) {
-                    console.error('Error sending file:', error);
-                } finally {
-                    sendButton.innerHTML = 'Отправить';
-                    sendButton.disabled = false;
-                }
-                return;
-            }
-
-            if (!text.trim() || !currentConversation) {
-                alert('Выберите пользователя и введите сообщение');
-                return;
-            }
-
             sendButton.innerHTML = '<span class="loading"></span>';
             sendButton.disabled = true;
 
             try {
-                console.log('Starting message sending process...');
-
-                // Get receiver's public key
-                const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);
-                console.log('Got receiver public key');
-
-                // Encrypt message
-                const encryptedData = await encryptMessage(text, receiverKeyInfo.public_key);
-                console.log('Message encrypted');
-
-                // Send to server
-                const response = await fetch('http://localhost:8000/messages/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentToken}`
-                    },
-                    body: JSON.stringify({
-                        text: encryptedData.encryptedText,
-                        receiver_username: currentConversation,
-                        encrypted_key: encryptedData.encryptedKey,
-                        iv: encryptedData.iv,
-                        signature: encryptedData.signature
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Ошибка отправки сообщения');
+                // Если есть файл, отправляем его вместо текста
+                if (currentFile) {
+                    const fileResponse = await uploadFile();
+                    if (fileResponse) {
+                        // Обновляем сообщения
+                        await loadMessages(currentConversation);
+                        await loadConversations();
+                    }
                 }
+                // Если есть текст, отправляем текстовое сообщение
+                else if (text.trim()) {
+                    if (!currentConversation) {
+                        alert('Выберите пользователя для отправки сообщения');
+                        return;
+                    }
 
-                const messageResponse = await response.json();
-                console.log('Message sent successfully:', messageResponse);
+                    console.log('Starting message sending process...');
 
-                document.getElementById('message-text').value = '';
+                    // Get receiver's public key
+                    const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);
+                    console.log('Got receiver public key');
 
-                // Reload messages and conversations
-                await loadMessages(currentConversation);
-                await loadConversations();
+                    // Encrypt message
+                    const encryptedData = await encryptMessage(text, receiverKeyInfo.public_key);
+                    console.log('Message encrypted');
 
+                    // Send to server
+                    await apiCall('/messages/send', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            receiver_username: currentConversation,
+                            encrypted_text: encryptedData.encryptedText,
+                            encrypted_key: encryptedData.encryptedKey,
+                            iv: encryptedData.iv,
+                            signature: encryptedData.signature
+                        })
+                    });
+                    console.log('Message sent successfully');
+
+                    // Clear input and update UI
+                    document.getElementById('message-text').value = '';
+                    await loadMessages(currentConversation);
+                    await loadConversations();
+                }
             } catch (error) {
                 console.error('Error sending message:', error);
-                alert('Ошибка отправки сообщения: ' + error.message);
+                alert('Ошибка отправки: ' + error.message);
             } finally {
                 sendButton.innerHTML = 'Отправить';
                 sendButton.disabled = false;
-            }
-        }
-
-        // ==================== AUTH FUNCTIONS ====================
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                alert('Введите имя пользователя и пароль');
-                return;
-            }
-
-            try {
-                console.log('Attempting login for:', username);
-
-                const response = await fetch('http://localhost:8000/login/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Login failed:', response.status, errorText);
-
-                    if (response.status === 401) {
-                        throw new Error('Неверное имя пользователя или пароль');
-                    } else {
-                        throw new Error('Ошибка сервера: ' + response.status);
-                    }
-                }
-
-                const data = await response.json();
-                console.log('Login successful, token received');
-
-                currentToken = data.access_token;
-                currentUser = username;
-
-                // Инициализируем CryptoManager
-                cryptoManager = new CryptoManager(currentUser);
-
-                // Save token for future use
-                localStorage.setItem('auth_token', currentToken);
-
-                // Load user data and keys
-                await loadUserData();
-                connectWebSocket();
-
-                showChat();
-
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Ошибка входа: ' + error.message);
-            }
-        }
-
-        async function register() {
-            const username = document.getElementById('reg-username').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-
-            if (!username || !password) {
-                alert('Пожалуйста, заполните имя пользователя и пароль');
-                return;
-            }
-
-            try {
-                // Создаем временный CryptoManager для генерации ключей
-                const tempCryptoManager = new CryptoManager(username);
-                const keys = await tempCryptoManager.generateAllKeys();
-                console.log('Generated keys:', keys);
-
-                if (!keys || !keys.encPublic) {
-                    throw new Error('Failed to generate keys');
-                }
-
-                const response = await fetch('http://localhost:8000/register/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        email: email || null,
-                        password: password,
-                        public_key: keys.encPublic
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Ошибка регистрации');
-                }
-
-                const userData = await response.json();
-                console.log('Registration successful:', userData);
-
-                alert('Регистрация успешна! Теперь войдите в систему.');
-                showLogin();
-
-            } catch (error) {
-                console.error('Error registering:', error);
-                alert('Ошибка регистрации: ' + error.message);
-            }
-        }
-
-        // ==================== USER DATA FUNCTIONS ====================
-        async function loadUserData() {
-            try {
-                // Проверяем, есть ли ключи, если нет - генерируем
-                const encPrivate = localStorage.getItem(`${currentUser}_enc_private`);
-                if (!encPrivate) {
-                    await cryptoManager.generateAllKeys();
-                }
-
-                // Load conversations and users
-                await loadConversations();
-                await loadAllUsers();
-
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
-
-        async function loadAllUsers() {
-            try {
-                allUsers = await apiCall('/users/');
-            } catch (error) {
-                console.error('Error loading users:', error);
-            }
-        }
-
-        // ==================== MESSAGE FUNCTIONS ====================
-        async function loadConversations() {
-            try {
-                const conversations = await apiCall('/conversations/with-info');
-                renderConversations(conversations);
-            } catch (error) {
-                console.error('Error loading conversations:', error);
-            }
-        }
-
-        async function loadMessages(username) {
-            try {
-                const messages = await apiCall(`/messages/conversation/${username}`);
-                renderMessages(messages);
-                currentConversation = username;
-                document.getElementById('current-chat').textContent = `Чат с ${username}`;
-
-                // Mark as read
-                await apiCall(`/messages/mark-read/${username}`, { method: 'POST' });
-            } catch (error) {
-                console.error('Error loading messages:', error);
-            }
-        }
-
-        async function sendMessage() {
-            const text = document.getElementById('message-text').value;
-            if (!text.trim() || !currentConversation) {
-                alert('Выберите пользователя и введите сообщение');
-                return;
-            }
-
-            try {
-                console.log('Starting message sending process...');
-
-                // Get receiver's public key
-                const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);
-                console.log('Got receiver public key');
-
-                // Encrypt message
-                const encryptedData = await encryptMessage(text, receiverKeyInfo.public_key);
-                console.log('Message encrypted');
-
-                // Send to server
-                const response = await fetch('http://localhost:8000/messages/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentToken}`
-                    },
-                    body: JSON.stringify({
-                        text: encryptedData.encryptedText,
-                        receiver_username: currentConversation,
-                        encrypted_key: encryptedData.encryptedKey,
-                        iv: encryptedData.iv,
-                        signature: encryptedData.signature
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Ошибка отправки сообщения');
-                }
-
-                const messageResponse = await response.json();
-                console.log('Message sent successfully:', messageResponse);
-
-                document.getElementById('message-text').value = '';
-
-                // Reload messages and conversations
-                await loadMessages(currentConversation);
-                await loadConversations();
-
-            } catch (error) {
-                console.error('Error sending message:', error);
-                alert('Ошибка отправки сообщения: ' + error.message);
             }
         }
 
@@ -2771,270 +2587,325 @@
                 websocket.close();
             }
 
-            if (!currentToken) {
-                console.error('No authentication token available');
-                return;
-            }
+            websocket = new WebSocket(`ws://localhost:8000/ws?token=${currentToken}`);
 
-            let wsToken = currentToken;
-            if (wsToken.startsWith('Bearer ')) {
-                wsToken = wsToken.slice(7);
-            }
-
-            console.log('Connecting WebSocket with token:', wsToken);
-
-            websocket = new WebSocket(`ws://localhost:8000/ws?token=${wsToken}`);
-
-            websocket.onopen = () => {
+            websocket.onopen = function() {
                 console.log('WebSocket connected');
-                document.getElementById('connection-status').textContent = '✅ Подключен';
-                document.getElementById('connection-status').style.color = 'green';
+                updateConnectionStatus('✅ Подключен');
             };
 
-            websocket.onmessage = async (event) => {
+            websocket.onmessage = async function(event) {
                 try {
                     const data = JSON.parse(event.data);
+                    console.log('WebSocket message received:', data);
 
                     if (data.type === 'new_message') {
-                        await handleNewMessage(data.message);
-                    } else if (data.type === 'messages_read') {
-                        handleMessagesRead(data.data);
+                        if (data.message.sender_username === currentConversation ||
+                            data.message.receiver_username === currentUser) {
+                            await loadMessages(currentConversation);
+                            await loadConversations();
+                        }
+                    } else if (data.type === 'file_uploaded') {
+                        if (data.file.receiver_username === currentUser ||
+                            data.file.sender_username === currentConversation) {
+                            await loadMessages(currentConversation);
+                            await loadConversations();
+                        }
                     }
                 } catch (error) {
                     console.error('Error processing WebSocket message:', error);
                 }
             };
 
-            websocket.onclose = () => {
+            websocket.onclose = function() {
                 console.log('WebSocket disconnected');
-                document.getElementById('connection-status').textContent = '❌ Отключен';
-                document.getElementById('connection-status').style.color = 'red';
-
-                setTimeout(connectWebSocket, 5000);
+                updateConnectionStatus('❌ Отключен');
+                // Try to reconnect after 3 seconds
+                setTimeout(connectWebSocket, 3000);
             };
 
-            websocket.onerror = (error) => {
+            websocket.onerror = function(error) {
                 console.error('WebSocket error:', error);
+                updateConnectionStatus('⚠️ Ошибка подключения');
             };
         }
 
-        async function handleNewMessage(messageData) {
-            try {
-                const decryptedText = await decryptMessage(
-                    messageData.encrypted_text,
-                    messageData.encrypted_key,
-                    messageData.iv,
-                    messageData.signature,
-                    messageData.sender_public_key
-                );
-
-                if (currentConversation === messageData.sender_username) {
-                    displayMessage({
-                        ...messageData,
-                        decrypted_text: decryptedText,
-                        is_own: false
-                    });
-                } else {
-                    await loadConversations();
-                }
-            } catch (error) {
-                console.error('Error handling new message:', error);
-            }
-        }
-
-        function handleMessagesRead(data) {
-            console.log('Messages read by:', data);
-        }
-
-        // ==================== SEARCH FUNCTIONS ====================
-        document.getElementById('user-search').addEventListener('input', async function(e) {
-            const query = e.target.value.trim();
-            if (query.length < 2) {
-                document.getElementById('search-results').innerHTML = '';
-                return;
-            }
-
-            try {
-                const users = await apiCall(`/users/search/${encodeURIComponent(query)}`);
-                displaySearchResults(users);
-            } catch (error) {
-                console.error('Search error:', error);
-            }
-        });
-
-        function displaySearchResults(users) {
-            const container = document.getElementById('search-results');
-            container.innerHTML = '';
-
-            if (users.length === 0) {
-                container.innerHTML = '<div style="color: #666; padding: 10px;">Пользователи не найдены</div>';
-                return;
-            }
-
-            users.forEach(user => {
-                const div = document.createElement('div');
-                div.className = 'search-result';
-                div.innerHTML = `
-                    <strong>${user.username}</strong>
-                    <br>
-                    <small>${user.email || 'Нет email'}</small>
-                    <button onclick="startConversation('${user.username}')">
-                        Написать
-                    </button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        async function startConversation(username) {
-            currentConversation = username;
-            document.getElementById('current-chat').textContent = `Чат с ${username}`;
-            document.getElementById('user-search').value = '';
-            document.getElementById('search-results').innerHTML = '';
-
-            await loadMessages(username);
+        function updateConnectionStatus(status) {
+            document.getElementById('connection-status').textContent = status;
         }
 
         // ==================== UI FUNCTIONS ====================
-        function renderConversations(conversations) {
-            const container = document.getElementById('conversations-list');
-            container.innerHTML = '';
-
-            if (conversations.length === 0) {
-                container.innerHTML = `
-                    <div style="color: #666; padding: 15px; text-align: center;">
-                        <p>У вас пока нет диалогов</p>
-                        <p>Найдите пользователей через поиск выше</p>
-                    </div>
-                `;
-                return;
-            }
-
-            conversations.forEach(conv => {
-                const div = document.createElement('div');
-                div.className = `conversation ${currentConversation === conv.user.username ? 'active' : ''}`;
-                div.innerHTML = `
-                    <strong>${conv.user.username}</strong>
-                    ${conv.unread_count > 0 ? `<span class="unread-badge">${conv.unread_count}</span>` : ''}
-                    ${conv.last_message ? `<br><small>${new Date(conv.last_message.timestamp).toLocaleTimeString()}</small>` : ''}
-                `;
-
-                div.onclick = () => loadMessages(conv.user.username);
-                container.appendChild(div);
-            });
-        }
-
-        async function renderMessages(messages) {
-            const container = document.getElementById('messages-container');
-            container.innerHTML = '';
-
-            if (messages.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #666;">
-                        <p>Нет сообщений</p>
-                        <p>Напишите первое сообщение!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            for (const message of messages) {
-                let decryptedText;
-                try {
-                    decryptedText = await decryptMessage(
-                        message.encrypted_text,
-                        message.encrypted_key,
-                        message.iv,
-                        message.signature,
-                        message.sender.public_key
-                    );
-                } catch (error) {
-                    console.error('Decryption error for message', message.id, ':', error);
-                    decryptedText = 'Не удалось расшифровать сообщение';
-                }
-
-                displayMessage({
-                    ...message,
-                    decrypted_text: decryptedText,
-                    is_own: message.sender.username === currentUser
-                });
-            }
-
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function displayMessage(message) {
-            const container = document.getElementById('messages-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.is_own ? 'own' : 'other'}`;
-            messageDiv.innerHTML = `
-                <div>${message.decrypted_text}</div>
-                <small>${new Date(message.timestamp).toLocaleTimeString()}</small>
-            `;
-            container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // ==================== NAVIGATION FUNCTIONS ====================
         function showLogin() {
             document.getElementById('login-page').style.display = 'block';
             document.getElementById('register-page').style.display = 'none';
-            document.getElementById('chat-container').style.display = 'none';
         }
 
         function showRegister() {
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('register-page').style.display = 'block';
-            document.getElementById('chat-container').style.display = 'none';
         }
 
-        function showChat() {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('register-page').style.display = 'none';
-            document.getElementById('chat-container').style.display = 'flex';
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                currentUser = username;
+                currentToken = response.access_token;
+                cryptoManager = new CryptoManager(username);
+
+                // Check if keys exist, generate if not
+                if (!localStorage.getItem(username + "_enc_private")) {
+                    await cryptoManager.generateAllKeys();
+                    console.log('New keys generated for user:', username);
+                }
+
+                // Show chat interface
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'flex';
+
+                // Load data
+                await loadConversations();
+                await loadAllUsers();
+                connectWebSocket();
+
+            } catch (error) {
+                alert('Ошибка входа: ' + error.message);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                await apiCall('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                alert('Регистрация успешна! Теперь вы можете войти.');
+                showLogin();
+
+            } catch (error) {
+                alert('Ошибка регистрации: ' + error.message);
+            }
+        }
+
+        // ==================== CONVERSATION FUNCTIONS ====================
+        async function loadConversations() {
+            try {
+                const conversations = await apiCall('/conversations');
+                const container = document.getElementById('conversations-list');
+
+                container.innerHTML = '';
+
+                conversations.forEach(conv => {
+                    const div = document.createElement('div');
+                    div.className = `conversation ${currentConversation === conv.username ? 'active' : ''}`;
+                    div.innerHTML = `
+                        <strong>${conv.username}</strong>
+                        ${conv.unread_count > 0 ? `<span class="unread-badge">${conv.unread_count}</span>` : ''}
+                        <div style="font-size: 12px; color: #666;">${conv.last_message || 'Нет сообщений'}</div>
+                    `;
+                    div.onclick = () => selectConversation(conv.username);
+                    container.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+            }
+        }
+
+        async function selectConversation(username) {
+            currentConversation = username;
+            document.getElementById('current-chat').textContent = username;
+
+            // Update active conversation in sidebar
+            document.querySelectorAll('.conversation').forEach(conv => {
+                conv.classList.remove('active');
+            });
+            document.querySelectorAll('.conversation').forEach(conv => {
+                if (conv.textContent.includes(username)) {
+                    conv.classList.add('active');
+                }
+            });
+
+            await loadMessages(username);
+
+            // Mark as read
+            try {
+                await apiCall(`/conversations/${username}/read`, {
+                    method: 'POST'
+                });
+                await loadConversations();
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+
+        // ==================== MESSAGE FUNCTIONS ====================
+        async function loadMessages(username) {
+            try {
+                const messages = await apiCall(`/messages/${username}`);
+                const container = document.getElementById('messages-container');
+
+                container.innerHTML = '';
+
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="message-info">Нет сообщений</div>';
+                    return;
+                }
+
+                for (const msg of messages) {
+                    await displayMessage(msg);
+                }
+
+                // Scroll to bottom
+                container.scrollTop = container.scrollHeight;
+
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messages-container').innerHTML =
+                    '<div class="message-info">Ошибка загрузки сообщений</div>';
+            }
+        }
+
+        async function displayMessage(msg) {
+            const container = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+
+            const isOwn = msg.sender_username === currentUser;
+            messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+
+            try {
+                let content = '';
+
+                if (msg.file_id) {
+                    // Это файл
+                    content = `
+                        <div class="file-message">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">${msg.file_name}</div>
+                                <div class="file-size">${(msg.file_size / 1024).toFixed(1)} KB</div>
+                            </div>
+                            <button class="download-btn" onclick="downloadFile('${msg.file_id}', '${msg.file_name}')">
+                                Скачать
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Это текстовое сообщение
+                    let decryptedText = await decryptMessage(
+                        msg.encrypted_text,
+                        msg.encrypted_key,
+                        msg.iv,
+                        msg.signature,
+                        msg.sender_public_key
+                    );
+
+                    content = `
+                        <div>${decryptedText}</div>
+                        <div class="encryption-indicator">🔒 Зашифровано</div>
+                    `;
+                }
+
+                messageDiv.innerHTML = content + `
+                    <div class="message-status">
+                        ${new Date(msg.timestamp).toLocaleTimeString()}
+                        ${isOwn ? '✓' : ''}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error displaying message:', error);
+                messageDiv.innerHTML = `
+                    <div>Ошибка отображения сообщения</div>
+                    <div class="message-status">
+                        ${new Date(msg.timestamp).toLocaleTimeString()}
+                    </div>
+                `;
+            }
+
+            container.appendChild(messageDiv);
+        }
+
+        // ==================== USER SEARCH FUNCTIONS ====================
+        async function loadAllUsers() {
+            try {
+                allUsers = await apiCall('/users');
+
+                // Setup search functionality
+                document.getElementById('user-search').addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const resultsContainer = document.getElementById('search-results');
+
+                    resultsContainer.innerHTML = '';
+
+                    if (searchTerm.length < 2) return;
+
+                    const filteredUsers = allUsers.filter(user =>
+                        user.username.toLowerCase().includes(searchTerm) &&
+                        user.username !== currentUser
+                    );
+
+                    filteredUsers.forEach(user => {
+                        const div = document.createElement('div');
+                        div.className = 'search-result';
+                        div.innerHTML = `
+                            <span>${user.username}</span>
+                            <button onclick="startConversation('${user.username}')">Написать</button>
+                        `;
+                        resultsContainer.appendChild(div);
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function startConversation(username) {
+            // Clear search
+            document.getElementById('user-search').value = '';
+            document.getElementById('search-results').innerHTML = '';
+
+            await selectConversation(username);
         }
 
         // ==================== INITIALIZATION ====================
+        // Check if user is already logged in
         window.onload = function() {
-            showLogin();
-
-            // Check if we have a saved token
             const savedToken = localStorage.getItem('auth_token');
-            if (savedToken) {
+            const savedUser = localStorage.getItem('current_user');
+
+            if (savedToken && savedUser) {
                 currentToken = savedToken;
+                currentUser = savedUser;
+                cryptoManager = new CryptoManager(savedUser);
+
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'flex';
+
+                loadConversations();
+                loadAllUsers();
+                connectWebSocket();
             }
         };
 
-        // Глобальные обработчики ошибок
-        window.addEventListener('error', function(e) {
-            console.error('Global error:', e.error);
-        });
+        // Save token on login
+        if (currentToken) {
+            localStorage.setItem('auth_token', currentToken);
+            localStorage.setItem('current_user', currentUser);
+        }
 
-        window.addEventListener('unhandledrejection', function(e) {
-            console.error('Unhandled promise rejection:', e.reason);
-        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
