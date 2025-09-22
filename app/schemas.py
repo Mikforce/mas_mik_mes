@@ -34,21 +34,33 @@ class MessageBase(BaseModel):
     text: str
 
 class MessageCreate(BaseModel):
-    text: str = Field(..., description="Encrypted message text")
+    # Принимаем encrypted_text из фронтенда, маппим в text
+    text: str = Field(..., alias="encrypted_text", description="Encrypted message text")
     receiver_username: str
     encrypted_key: str = Field(..., description="Encrypted AES key")
     iv: str = Field(..., description="Initialization vector for AES")
     signature: str = Field(..., description="Message signature")
 
     class Config:
+        # Разрешаем заполнять по имени и по алиасу
+        allow_population_by_field_name = True
         json_schema_extra = {
-            "example": {
-                "text": "base64-encrypted-text",
-                "receiver_username": "username",
-                "encrypted_key": "base64-encrypted-aes-key",
-                "iv": "base64-iv",
-                "signature": "base64-signature"
-            }
+            "examples": [
+                {
+                    "encrypted_text": "base64-encrypted-text",
+                    "receiver_username": "username",
+                    "encrypted_key": "base64-encrypted-aes-key",
+                    "iv": "base64-iv",
+                    "signature": "base64-signature"
+                },
+                {
+                    "text": "base64-encrypted-text",
+                    "receiver_username": "username",
+                    "encrypted_key": "base64-encrypted-aes-key",
+                    "iv": "base64-iv",
+                    "signature": "base64-signature"
+                }
+            ]
         }
 
 class Message(BaseModel):

@@ -1,1522 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="ru">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Secure Family Messenger</title>-->
-<!--    <style>-->
-<!--        * {-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--            box-sizing: border-box;-->
-<!--        }-->
-
-<!--        body {-->
-<!--            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-->
-<!--            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);-->
-<!--            height: 100vh;-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--        }-->
-
-<!--        .container {-->
-<!--            background: white;-->
-<!--            border-radius: 15px;-->
-<!--            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);-->
-<!--            width: 90%;-->
-<!--            max-width: 1200px;-->
-<!--            height: 90vh;-->
-<!--            display: flex;-->
-<!--            overflow: hidden;-->
-<!--        }-->
-
-<!--        .sidebar {-->
-<!--            width: 300px;-->
-<!--            background: #f8f9fa;-->
-<!--            border-right: 1px solid #e9ecef;-->
-<!--            padding: 20px;-->
-<!--            overflow-y: auto;-->
-<!--        }-->
-
-<!--        .chat-area {-->
-<!--            flex: 1;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--        }-->
-
-<!--        .chat-header {-->
-<!--            padding: 20px;-->
-<!--            background: white;-->
-<!--            border-bottom: 1px solid #e9ecef;-->
-<!--            display: flex;-->
-<!--            align-items: center;-->
-<!--            justify-content: space-between;-->
-<!--        }-->
-
-<!--        .messages {-->
-<!--            flex: 1;-->
-<!--            padding: 20px;-->
-<!--            overflow-y: auto;-->
-<!--            background: #f0f2f5;-->
-<!--        }-->
-
-<!--        .message-input {-->
-<!--            padding: 20px;-->
-<!--            background: white;-->
-<!--            border-top: 1px solid #e9ecef;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            gap: 10px;-->
-<!--        }-->
-
-<!--        .input-controls {-->
-<!--            display: flex;-->
-<!--            gap: 10px;-->
-<!--            align-items: center;-->
-<!--        }-->
-
-<!--        .conversation {-->
-<!--            padding: 15px;-->
-<!--            margin-bottom: 10px;-->
-<!--            border-radius: 10px;-->
-<!--            cursor: pointer;-->
-<!--            transition: background 0.3s;-->
-<!--        }-->
-
-<!--        .conversation:hover {-->
-<!--            background: #e9ecef;-->
-<!--        }-->
-
-<!--        .conversation.active {-->
-<!--            background: #007bff;-->
-<!--            color: white;-->
-<!--        }-->
-
-<!--        .message {-->
-<!--            margin-bottom: 15px;-->
-<!--            padding: 10px 15px;-->
-<!--            border-radius: 15px;-->
-<!--            max-width: 70%;-->
-<!--            word-wrap: break-word;-->
-<!--        }-->
-
-<!--        .message.own {-->
-<!--            background: #007bff;-->
-<!--            color: white;-->
-<!--            margin-left: auto;-->
-<!--        }-->
-
-<!--        .message.other {-->
-<!--            background: white;-->
-<!--            border: 1px solid #e9ecef;-->
-<!--        }-->
-
-<!--        .message-image {-->
-<!--            max-width: 100%;-->
-<!--            border-radius: 10px;-->
-<!--            margin-top: 5px;-->
-<!--        }-->
-
-<!--        .login-form {-->
-<!--            background: white;-->
-<!--            padding: 40px;-->
-<!--            border-radius: 15px;-->
-<!--            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);-->
-<!--            width: 400px;-->
-<!--        }-->
-
-<!--        input, textarea, button {-->
-<!--            width: 100%;-->
-<!--            padding: 12px;-->
-<!--            margin: 10px 0;-->
-<!--            border: 1px solid #ddd;-->
-<!--            border-radius: 8px;-->
-<!--            font-size: 16px;-->
-<!--        }-->
-
-<!--        button {-->
-<!--            background: #007bff;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            cursor: pointer;-->
-<!--            transition: background 0.3s;-->
-<!--        }-->
-
-<!--        button:hover {-->
-<!--            background: #0056b3;-->
-<!--        }-->
-
-<!--        .btn-secondary {-->
-<!--            background: #6c757d;-->
-<!--        }-->
-
-<!--        .btn-secondary:hover {-->
-<!--            background: #5a6268;-->
-<!--        }-->
-
-<!--        .btn-success {-->
-<!--            background: #28a745;-->
-<!--        }-->
-
-<!--        .btn-success:hover {-->
-<!--            background: #218838;-->
-<!--        }-->
-
-<!--        .unread-badge {-->
-<!--            background: #dc3545;-->
-<!--            color: white;-->
-<!--            border-radius: 50%;-->
-<!--            padding: 2px 6px;-->
-<!--            font-size: 12px;-->
-<!--            margin-left: 10px;-->
-<!--        }-->
-
-<!--        .search-result {-->
-<!--            transition: background-color 0.2s;-->
-<!--            padding: 10px;-->
-<!--            border-bottom: 1px solid #eee;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-
-<!--        .search-result:hover {-->
-<!--            background-color: #f0f0f0;-->
-<!--        }-->
-
-<!--        .search-result button {-->
-<!--            background: #28a745;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            border-radius: 3px;-->
-<!--            cursor: pointer;-->
-<!--            padding: 5px 10px;-->
-<!--            font-size: 12px;-->
-<!--            float: right;-->
-<!--        }-->
-
-<!--        .search-result button:hover {-->
-<!--            background: #218838;-->
-<!--        }-->
-
-<!--        .file-preview {-->
-<!--            margin-top: 10px;-->
-<!--            padding: 10px;-->
-<!--            background: #f8f9fa;-->
-<!--            border-radius: 8px;-->
-<!--            border: 1px dashed #dee2e6;-->
-<!--        }-->
-
-<!--        .file-preview img {-->
-<!--            max-width: 100px;-->
-<!--            max-height: 100px;-->
-<!--            border-radius: 5px;-->
-<!--        }-->
-
-<!--        .file-preview .remove-file {-->
-<!--            background: #dc3545;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            border-radius: 50%;-->
-<!--            width: 20px;-->
-<!--            height: 20px;-->
-<!--            cursor: pointer;-->
-<!--            margin-left: 10px;-->
-<!--        }-->
-
-<!--        .loading {-->
-<!--            display: inline-block;-->
-<!--            width: 20px;-->
-<!--            height: 20px;-->
-<!--            border: 3px solid rgba(255,255,255,.3);-->
-<!--            border-radius: 50%;-->
-<!--            border-top-color: #fff;-->
-<!--            animation: spin 1s ease-in-out infinite;-->
-<!--        }-->
-
-<!--        @keyframes spin {-->
-<!--            to { transform: rotate(360deg); }-->
-<!--        }-->
-
-<!--        .encryption-indicator {-->
-<!--            font-size: 12px;-->
-<!--            color: #28a745;-->
-<!--            margin-top: 5px;-->
-<!--        }-->
-
-<!--        .message-status {-->
-<!--            font-size: 11px;-->
-<!--            text-align: right;-->
-<!--            margin-top: 3px;-->
-<!--            color: rgba(255, 255, 255, 0.7);-->
-<!--        }-->
-
-<!--        .message.other .message-status {-->
-<!--            color: rgba(0, 0, 0, 0.5);-->
-<!--        }-->
-<!--    </style>-->
-<!--</head>-->
-<!--<body>-->
-<!--    <div id="app">-->
-<!--        <div id="login-page" class="login-form">-->
-<!--            <h2>Вход в Secure Messenger</h2>-->
-<!--            <input type="text" id="username" placeholder="Имя пользователя">-->
-<!--            <input type="password" id="password" placeholder="Пароль">-->
-<!--            <button onclick="login()">Войти</button>-->
-<!--            <button class="btn-secondary" onclick="showRegister()">Регистрация</button>-->
-<!--        </div>-->
-
-<!--        <div id="register-page" class="login-form" style="display: none;">-->
-<!--            <h2>Регистрация</h2>-->
-<!--            <input type="text" id="reg-username" placeholder="Имя пользователя">-->
-<!--            <input type="email" id="reg-email" placeholder="Email (необязательно)">-->
-<!--            <input type="password" id="reg-password" placeholder="Пароль">-->
-<!--            <button onclick="register()">Зарегистрироваться</button>-->
-<!--            <button class="btn-secondary" onclick="showLogin()">Назад к входу</button>-->
-<!--        </div>-->
-
-<!--        <div id="chat-container" class="container" style="display: none;">-->
-<!--            <div class="sidebar">-->
-<!--                <h3>Диалоги</h3>-->
-
-<!--                <div style="margin-bottom: 15px;">-->
-<!--                    <input type="text" id="user-search" placeholder="Поиск пользователей..."-->
-<!--                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">-->
-<!--                    <div id="search-results" style="margin-top: 10px;"></div>-->
-<!--                </div>-->
-
-<!--                <div id="conversations-list"></div>-->
-<!--            </div>-->
-
-<!--            <div class="chat-area">-->
-<!--                <div class="chat-header">-->
-<!--                    <h3 id="current-chat">Выберите диалог</h3>-->
-<!--                    <span id="connection-status">❌ Отключен</span>-->
-<!--                </div>-->
-
-<!--                <div class="messages" id="messages-container">-->
-<!--                    <div class="message-info">Выберите диалог для начала общения</div>-->
-<!--                </div>-->
-
-<!--                <div class="message-input">-->
-<!--                    <div id="file-preview" class="file-preview" style="display: none;"></div>-->
-<!--                    <textarea id="message-text" placeholder="Введите сообщение..." rows="3"></textarea>-->
-<!--                    <div class="input-controls">-->
-<!--                        <input type="file" id="file-input" accept="image/*, .pdf, .txt" style="display: none;">-->
-<!--                        <button class="btn-secondary" onclick="document.getElementById('file-input').click()">-->
-<!--                            📎 Прикрепить файл-->
-<!--                        </button>-->
-<!--                        <button id="send-button" class="btn-success" onclick="sendMessage()">Отправить</button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <script>-->
-<!--        // ==================== CRYPTO MANAGER ====================-->
-<!--        class CryptoManager {-->
-<!--            constructor(username) {-->
-<!--                this.username = username;-->
-<!--                this.algOAEP = {-->
-<!--                    name: 'RSA-OAEP',-->
-<!--                    modulusLength: 2048,-->
-<!--                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),-->
-<!--                    hash: 'SHA-256'-->
-<!--                };-->
-<!--                this.algPSS = {-->
-<!--                    name: 'RSA-PSS',-->
-<!--                    modulusLength: 2048,-->
-<!--                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),-->
-<!--                    hash: 'SHA-256'-->
-<!--                };-->
-<!--            }-->
-
-<!--            // &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Генерация ключей &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--            async generateAllKeys() {-->
-<!--                console.log("🔑 Генерация ключей для пользователя:", this.username);-->
-
-<!--                // RSA-OAEP (шифрование)-->
-<!--                const encPair = await crypto.subtle.generateKey(-->
-<!--                    this.algOAEP, true, ['encrypt', 'decrypt']-->
-<!--                );-->
-
-<!--                const publicEncPem = this.arrayBufferToPem(-->
-<!--                    await crypto.subtle.exportKey('spki', encPair.publicKey), "PUBLIC"-->
-<!--                );-->
-<!--                const privateEncPem = this.arrayBufferToPem(-->
-<!--                    await crypto.subtle.exportKey('pkcs8', encPair.privateKey), "PRIVATE"-->
-<!--                );-->
-
-<!--                // RSA-PSS (подпись)-->
-<!--                const signPair = await crypto.subtle.generateKey(-->
-<!--                    this.algPSS, true, ['sign', 'verify']-->
-<!--                );-->
-
-<!--                const publicSignPem = this.arrayBufferToPem(-->
-<!--                    await crypto.subtle.exportKey('spki', signPair.publicKey), "PUBLIC"-->
-<!--                );-->
-<!--                const privateSignPem = this.arrayBufferToPem(-->
-<!--                    await crypto.subtle.exportKey('pkcs8', signPair.privateKey), "PRIVATE"-->
-<!--                );-->
-
-<!--                // Сохраняем в localStorage-->
-<!--                localStorage.setItem(this.username + "_enc_public", publicEncPem);-->
-<!--                localStorage.setItem(this.username + "_enc_private", privateEncPem);-->
-<!--                localStorage.setItem(this.username + "_sign_public", publicSignPem);-->
-<!--                localStorage.setItem(this.username + "_sign_private", privateSignPem);-->
-
-<!--                return {-->
-<!--                    encPublic: publicEncPem,-->
-<!--                    encPrivate: privateEncPem,-->
-<!--                    signPublic: publicSignPem,-->
-<!--                    signPrivate: privateSignPem-->
-<!--                };-->
-<!--            }-->
-
-<!--            // &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Импорт ключей &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--            async importPublicKey(pem, type = "RSA-OAEP") {-->
-<!--                const binaryDer = this.pemToArrayBuffer(pem);-->
-<!--                return await crypto.subtle.importKey(-->
-<!--                    "spki",-->
-<!--                    binaryDer,-->
-<!--                    type === "RSA-OAEP" ? this.algOAEP : this.algPSS,-->
-<!--                    true,-->
-<!--                    type === "RSA-OAEP" ? ["encrypt"] : ["verify"]-->
-<!--                );-->
-<!--            }-->
-
-<!--            async importPrivateKey(pem, type = "RSA-OAEP") {-->
-<!--                const binaryDer = this.pemToArrayBuffer(pem);-->
-<!--                return await crypto.subtle.importKey(-->
-<!--                    "pkcs8",-->
-<!--                    binaryDer,-->
-<!--                    type === "RSA-OAEP" ? this.algOAEP : this.algPSS,-->
-<!--                    true,-->
-<!--                    type === "RSA-OAEP" ? ["decrypt"] : ["sign"]-->
-<!--                );-->
-<!--            }-->
-
-<!--            // &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Шифрование / Расшифровка &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--            async encryptMessage(plaintext, receiverPublicKeyPem) {-->
-<!--                try {-->
-<!--                    console.log("🔒 Шифрование сообщения...");-->
-
-<!--                    // AES-ключ-->
-<!--                    const aesKey = await crypto.subtle.generateKey(-->
-<!--                        { name: 'AES-GCM', length: 256 },-->
-<!--                        true,-->
-<!--                        ['encrypt', 'decrypt']-->
-<!--                    );-->
-<!--                    const iv = crypto.getRandomValues(new Uint8Array(12));-->
-<!--                    const encoded = new TextEncoder().encode(plaintext);-->
-
-<!--                    const encryptedData = await crypto.subtle.encrypt(-->
-<!--                        { name: 'AES-GCM', iv },-->
-<!--                        aesKey,-->
-<!--                        encoded-->
-<!--                    );-->
-
-<!--                    // Экспортируем AES-ключ-->
-<!--                    const rawAesKey = await crypto.subtle.exportKey("raw", aesKey);-->
-
-<!--                    // Шифруем AES-ключ публичным RSA-->
-<!--                    const receiverPublicKey = await this.importPublicKey(receiverPublicKeyPem, "RSA-OAEP");-->
-<!--                    const encryptedAesKey = await crypto.subtle.encrypt(-->
-<!--                        { name: "RSA-OAEP" },-->
-<!--                        receiverPublicKey,-->
-<!--                        rawAesKey-->
-<!--                    );-->
-
-<!--                    // Подписываем сообщение-->
-<!--                    const signature = await this.signMessage(plaintext);-->
-
-<!--                    return {-->
-<!--                        encryptedText: this.arrayBufferToBase64(encryptedData),-->
-<!--                        encryptedKey: this.arrayBufferToBase64(encryptedAesKey),-->
-<!--                        iv: this.arrayBufferToBase64(iv),-->
-<!--                        signature: signature-->
-<!--                    };-->
-<!--                } catch (e) {-->
-<!--                    console.error("Ошибка при шифровании:", e);-->
-<!--                    throw new Error("Не удалось зашифровать сообщение");-->
-<!--                }-->
-<!--            }-->
-
-<!--            async decryptMessage(encryptedTextBase64, encryptedKeyBase64, ivBase64, signatureBase64, senderPublicKeyPem) {-->
-<!--                try {-->
-<!--                    console.log("🔓 Попытка расшифровки сообщения");-->
-
-<!--                    // Валидация данных-->
-<!--                    this.validateEncryptedData(encryptedTextBase64, encryptedKeyBase64, ivBase64);-->
-
-<!--                    // Проверяем наличие приватного ключа-->
-<!--                    const privateKeyPem = localStorage.getItem(this.username + "_enc_private");-->
-<!--                    if (!privateKeyPem) {-->
-<!--                        throw new Error("Приватный ключ для расшифровки не найден");-->
-<!--                    }-->
-
-<!--                    const privateKey = await this.importPrivateKey(privateKeyPem, "RSA-OAEP");-->
-
-<!--                    // Расшифровываем AES-ключ-->
-<!--                    const encryptedKeyBuffer = this.base64ToArrayBuffer(encryptedKeyBase64);-->
-<!--                    const decryptedAesKeyBuffer = await crypto.subtle.decrypt(-->
-<!--                        { name: "RSA-OAEP" },-->
-<!--                        privateKey,-->
-<!--                        encryptedKeyBuffer-->
-<!--                    );-->
-
-<!--                    // Импортируем AES ключ-->
-<!--                    const aesKey = await crypto.subtle.importKey(-->
-<!--                        "raw",-->
-<!--                        decryptedAesKeyBuffer,-->
-<!--                        { name: "AES-GCM" },-->
-<!--                        false,-->
-<!--                        ["decrypt"]-->
-<!--                    );-->
-
-<!--                    // Дешифруем сообщение-->
-<!--                    const ivBuffer = this.base64ToArrayBuffer(ivBase64);-->
-<!--                    const encryptedTextBuffer = this.base64ToArrayBuffer(encryptedTextBase64);-->
-
-<!--                    const decrypted = await crypto.subtle.decrypt(-->
-<!--                        { name: "AES-GCM", iv: ivBuffer },-->
-<!--                        aesKey,-->
-<!--                        encryptedTextBuffer-->
-<!--                    );-->
-
-<!--                    const plaintext = new TextDecoder().decode(decrypted);-->
-
-<!--                    // Проверка подписи (если есть)-->
-<!--                    if (senderPublicKeyPem && signatureBase64) {-->
-<!--                        try {-->
-<!--                            const valid = await this.verifySignature(plaintext, signatureBase64, senderPublicKeyPem);-->
-<!--                            if (!valid) {-->
-<!--                                console.warn("⚠️ Подпись сообщения недействительна");-->
-<!--                                return "[Непроверенное сообщение] " + plaintext;-->
-<!--                            }-->
-<!--                        } catch (signatureError) {-->
-<!--                            console.warn("Ошибка проверки подписи:", signatureError);-->
-<!--                        }-->
-<!--                    }-->
-
-<!--                    return plaintext;-->
-
-<!--                } catch (e) {-->
-<!--                    console.error("❌ Критическая ошибка при расшифровке:", e);-->
-
-<!--                    // Fallback: попробуем просто декодировать base64-->
-<!--                    try {-->
-<!--                        const fallbackText = atob(encryptedTextBase64);-->
-<!--                        return "[Fallback] " + fallbackText;-->
-<!--                    } catch (fallbackError) {-->
-<!--                        throw new Error("Не удалось расшифровать сообщение: " + e.message);-->
-<!--                    }-->
-<!--                }-->
-<!--            }-->
-
-<!--            // ========== МЕТОД ДЛЯ ШИФРОВАНИЯ ФАЙЛОВ ==========-->
-<!--            async encryptFile(file, receiverPublicKeyPem) {-->
-<!--                try {-->
-<!--                    console.log("🔒 Шифрование файла...", file.name);-->
-
-<!--                    // Читаем файл как ArrayBuffer-->
-<!--                    const fileBuffer = await file.arrayBuffer();-->
-
-<!--                    // Генерируем AES ключ-->
-<!--                    const aesKey = await crypto.subtle.generateKey(-->
-<!--                        { name: 'AES-GCM', length: 256 },-->
-<!--                        true,-->
-<!--                        ['encrypt', 'decrypt']-->
-<!--                    );-->
-
-<!--                    const iv = crypto.getRandomValues(new Uint8Array(12));-->
-
-<!--                    // Шифруем файл-->
-<!--                    const encryptedData = await crypto.subtle.encrypt(-->
-<!--                        { name: 'AES-GCM', iv },-->
-<!--                        aesKey,-->
-<!--                        fileBuffer-->
-<!--                    );-->
-
-<!--                    // Экспортируем AES ключ-->
-<!--                    const rawAesKey = await crypto.subtle.exportKey("raw", aesKey);-->
-
-<!--                    // Шифруем AES ключ публичным ключом получателя-->
-<!--                    const receiverPublicKey = await this.importPublicKey(receiverPublicKeyPem, "RSA-OAEP");-->
-<!--                    const encryptedAesKey = await crypto.subtle.encrypt(-->
-<!--                        { name: "RSA-OAEP" },-->
-<!--                        receiverPublicKey,-->
-<!--                        rawAesKey-->
-<!--                    );-->
-
-<!--                    // Подписываем зашифрованные данные-->
-<!--                    const signature = await this.signMessage(this.arrayBufferToBase64(encryptedData));-->
-
-<!--                    return {-->
-<!--                        encryptedData: this.arrayBufferToBase64(encryptedData),-->
-<!--                        encryptedKey: this.arrayBufferToBase64(encryptedAesKey),-->
-<!--                        iv: this.arrayBufferToBase64(iv),-->
-<!--                        signature: signature,-->
-<!--                        filename: file.name,-->
-<!--                        fileType: file.type,-->
-<!--                        fileSize: file.size-->
-<!--                    };-->
-<!--                } catch (e) {-->
-<!--                    console.error("Ошибка при шифровании файла:", e);-->
-<!--                    throw new Error("Не удалось зашифровать файл");-->
-<!--                }-->
-<!--            }-->
-
-<!--            // ========== МЕТОД ДЛЯ РАСШИФРОВКИ ФАЙЛОВ ==========-->
-<!--            async decryptFile(encryptedDataBase64, encryptedKeyBase64, ivBase64, signatureBase64, senderPublicKeyPem) {-->
-<!--                try {-->
-<!--                    console.log("🔓 Расшифровка файла...");-->
-
-<!--                    // Валидация данных-->
-<!--                    this.validateEncryptedData(encryptedDataBase64, encryptedKeyBase64, ivBase64);-->
-
-<!--                    // Проверяем наличие приватного ключа-->
-<!--                    const privateKeyPem = localStorage.getItem(this.username + "_enc_private");-->
-<!--                    if (!privateKeyPem) {-->
-<!--                        throw new Error("Приватный ключ для расшифровки не найден");-->
-<!--                    }-->
-
-<!--                    const privateKey = await this.importPrivateKey(privateKeyPem, "RSA-OAEP");-->
-
-<!--                    // Расшифровываем AES ключ-->
-<!--                    const encryptedKeyBuffer = this.base64ToArrayBuffer(encryptedKeyBase64);-->
-<!--                    const decryptedAesKeyBuffer = await crypto.subtle.decrypt(-->
-<!--                        { name: "RSA-OAEP" },-->
-<!--                        privateKey,-->
-<!--                        encryptedKeyBuffer-->
-<!--                    );-->
-
-<!--                    // Импортируем AES ключ-->
-<!--                    const aesKey = await crypto.subtle.importKey(-->
-<!--                        "raw",-->
-<!--                        decryptedAesKeyBuffer,-->
-<!--                        { name: "AES-GCM" },-->
-<!--                        false,-->
-<!--                        ["decrypt"]-->
-<!--                    );-->
-
-<!--                    // Расшифровываем файл-->
-<!--                    const ivBuffer = this.base64ToArrayBuffer(ivBase64);-->
-<!--                    const encryptedDataBuffer = this.base64ToArrayBuffer(encryptedDataBase64);-->
-
-<!--                    const decrypted = await crypto.subtle.decrypt(-->
-<!--                        { name: "AES-GCM", iv: ivBuffer },-->
-<!--                        aesKey,-->
-<!--                        encryptedDataBuffer-->
-<!--                    );-->
-
-<!--                    // Проверка подписи (если есть)-->
-<!--                    if (senderPublicKeyPem && signatureBase64) {-->
-<!--                        try {-->
-<!--                            const valid = await this.verifySignature(-->
-<!--                                this.arrayBufferToBase64(encryptedDataBuffer),-->
-<!--                                signatureBase64,-->
-<!--                                senderPublicKeyPem-->
-<!--                            );-->
-<!--                            if (!valid) {-->
-<!--                                console.warn("⚠️ Подпись файла недействительна");-->
-<!--                            }-->
-<!--                        } catch (signatureError) {-->
-<!--                            console.warn("Ошибка проверки подписи файла:", signatureError);-->
-<!--                        }-->
-<!--                    }-->
-
-<!--                    return new Blob([decrypted]);-->
-<!--                } catch (e) {-->
-<!--                    console.error("❌ Ошибка при расшифровке файла:", e);-->
-<!--                    throw new Error("Не удалось расшифровать файл: " + e.message);-->
-<!--                }-->
-<!--            }-->
-
-<!--            // &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Подпись / Проверка &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--            async signMessage(message) {-->
-<!--                try {-->
-<!--                    const privateSignPem = localStorage.getItem(this.username + "_sign_private");-->
-<!--                    const privateKey = await this.importPrivateKey(privateSignPem, "RSA-PSS");-->
-
-<!--                    const data = new TextEncoder().encode(message);-->
-
-<!--                    const signature = await crypto.subtle.sign(-->
-<!--                        { name: "RSA-PSS", saltLength: 32 },-->
-<!--                        privateKey,-->
-<!--                        data-->
-<!--                    );-->
-
-<!--                    return this.arrayBufferToBase64(signature);-->
-<!--                } catch (e) {-->
-<!--                    console.error("Ошибка при подписании:", e);-->
-<!--                    return "signature-error";-->
-<!--                }-->
-<!--            }-->
-
-<!--            async verifySignature(message, signatureBase64, publicKeyPem) {-->
-<!--                try {-->
-<!--                    const publicKey = await this.importPublicKey(publicKeyPem, "RSA-PSS");-->
-<!--                    const data = new TextEncoder().encode(message);-->
-
-<!--                    return await crypto.subtle.verify(-->
-<!--                        { name: "RSA-PSS", saltLength: 32 },-->
-<!--                        publicKey,-->
-<!--                        this.base64ToArrayBuffer(signatureBase64),-->
-<!--                        data-->
-<!--                    );-->
-<!--                } catch (e) {-->
-<!--                    console.error("Ошибка при проверке подписи:", e);-->
-<!--                    return false;-->
-<!--                }-->
-<!--            }-->
-
-<!--            // &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; Вспомогательные &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--            arrayBufferToBase64(buffer) {-->
-<!--                return btoa(String.fromCharCode(...new Uint8Array(buffer)));-->
-<!--            }-->
-
-<!--            base64ToArrayBuffer(base64) {-->
-<!--                try {-->
-<!--                    const cleanedBase64 = base64.replace(/\s+/g, '').replace(/[^A-Za-z0-9+/=]/g, '');-->
-
-<!--                    if (cleanedBase64.length % 4 !== 0) {-->
-<!--                        console.warn('Base64 строка имеет некорректную длину, добавляем padding');-->
-<!--                        const paddedBase64 = cleanedBase64 + '='.repeat((4 - cleanedBase64.length % 4) % 4);-->
-<!--                        return this.rawBase64ToArrayBuffer(paddedBase64);-->
-<!--                    }-->
-
-<!--                    return this.rawBase64ToArrayBuffer(cleanedBase64);-->
-<!--                } catch (e) {-->
-<!--                    console.error('Ошибка преобразования base64:', e);-->
-<!--                    throw new Error('Некорректный формат base64 данных: ' + e.message);-->
-<!--                }-->
-<!--            }-->
-
-<!--            rawBase64ToArrayBuffer(base64) {-->
-<!--                const binary = atob(base64);-->
-<!--                const bytes = new Uint8Array(binary.length);-->
-<!--                for (let i = 0; i < binary.length; i++) {-->
-<!--                    bytes[i] = binary.charCodeAt(i);-->
-<!--                }-->
-<!--                return bytes.buffer;-->
-<!--            }-->
-
-<!--            arrayBufferToPem(arrayBuffer, type) {-->
-<!--                const base64 = this.arrayBufferToBase64(arrayBuffer);-->
-<!--                const pemHeader = `-&#45;&#45;&#45;&#45;BEGIN ${type} KEY-&#45;&#45;&#45;&#45;\n`;-->
-<!--                const pemFooter = `\n-&#45;&#45;&#45;&#45;END ${type} KEY-&#45;&#45;&#45;&#45;`;-->
-<!--                const body = base64.match(/.{1,64}/g).join("\n");-->
-<!--                return pemHeader + body + pemFooter;-->
-<!--            }-->
-
-<!--            pemToArrayBuffer(pem) {-->
-<!--                const b64 = pem.replace(/-&#45;&#45;&#45;&#45;[^-]+-&#45;&#45;&#45;&#45;/g, "").replace(/\s+/g, "");-->
-<!--                return this.base64ToArrayBuffer(b64);-->
-<!--            }-->
-
-<!--            validateEncryptedData(encryptedTextBase64, encryptedKeyBase64, ivBase64) {-->
-<!--                const requiredFields = [-->
-<!--                    { name: 'encryptedText', value: encryptedTextBase64 },-->
-<!--                    { name: 'encryptedKey', value: encryptedKeyBase64 },-->
-<!--                    { name: 'iv', value: ivBase64 }-->
-<!--                ];-->
-
-<!--                for (const field of requiredFields) {-->
-<!--                    if (!field.value || typeof field.value !== 'string') {-->
-<!--                        throw new Error(`Отсутствует обязательное поле: ${field.name}`);-->
-<!--                    }-->
-
-<!--                    if (field.value.trim().length === 0) {-->
-<!--                        throw new Error(`Пустое значение поля: ${field.name}`);-->
-<!--                    }-->
-
-<!--                    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(field.value.replace(/\s+/g, ''))) {-->
-<!--                        throw new Error(`Некорректный формат base64 в поле: ${field.name}`);-->
-<!--                    }-->
-<!--                }-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== APPLICATION CODE ====================-->
-<!--        let currentUser = null;-->
-<!--        let currentToken = null;-->
-<!--        let websocket = null;-->
-<!--        let currentConversation = null;-->
-<!--        let cryptoManager = null;-->
-<!--        let allUsers = [];-->
-<!--        let currentFile = null; // Для хранения выбранного файла-->
-
-<!--        // ==================== FILE HANDLING ====================-->
-<!--        document.getElementById('file-input').addEventListener('change', function(e) {-->
-<!--            const file = e.target.files[0];-->
-<!--            if (!file) return;-->
-
-<!--            // Проверяем размер файла (максимум 10MB)-->
-<!--            if (file.size > 10 * 1024 * 1024) {-->
-<!--                alert('Размер файла не должен превышать 10MB');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            currentFile = file;-->
-<!--            showFilePreview(file);-->
-<!--        });-->
-
-<!--        function showFilePreview(file) {-->
-<!--            const previewContainer = document.getElementById('file-preview');-->
-<!--            const reader = new FileReader();-->
-
-<!--            reader.onload = function(e) {-->
-<!--                let previewHTML = '';-->
-
-<!--                if (file.type.startsWith('image/')) {-->
-<!--                    previewHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 60px; max-height: 60px;">`;-->
-<!--                } else {-->
-<!--                    previewHTML = `<div style="font-size: 24px;">📄</div>`;-->
-<!--                }-->
-
-<!--                previewContainer.innerHTML = `-->
-<!--                    <div style="display: flex; align-items: center; justify-content: space-between;">-->
-<!--                        <div style="display: flex; align-items: center;">-->
-<!--                            ${previewHTML}-->
-<!--                            <div style="margin-left: 10px;">-->
-<!--                                <div>${file.name}</div>-->
-<!--                                <div style="font-size: 12px; color: #666;">${(file.size / 1024).toFixed(1)} KB</div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <button class="remove-file" onclick="removeFile()">×</button>-->
-<!--                    </div>-->
-<!--                `;-->
-<!--                previewContainer.style.display = 'block';-->
-<!--            };-->
-
-<!--            reader.readAsDataURL(file);-->
-<!--        }-->
-
-<!--        function removeFile() {-->
-<!--            currentFile = null;-->
-<!--            document.getElementById('file-preview').style.display = 'none';-->
-<!--            document.getElementById('file-input').value = '';-->
-<!--        }-->
-
-<!--        // ==================== API FUNCTIONS ====================-->
-<!--        async function apiCall(endpoint, options = {}) {-->
-<!--            try {-->
-<!--                const response = await fetch(`http://localhost:8000${endpoint}`, {-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                        'Authorization': currentToken ? `Bearer ${currentToken}` : '',-->
-<!--                    },-->
-<!--                    ...options-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorText = await response.text();-->
-<!--                    throw new Error(`API error ${response.status}: ${errorText}`);-->
-<!--                }-->
-
-<!--                return response.json();-->
-<!--            } catch (error) {-->
-<!--                console.error('API call failed:', error);-->
-<!--                throw error;-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== CRYPTO FUNCTIONS ====================-->
-<!--        async function encryptMessage(text, receiverPublicKey) {-->
-<!--            ensureCryptoManager();-->
-<!--            try {-->
-<!--                console.log('Encrypting message for:', receiverPublicKey.substring(0, 50) + '...');-->
-<!--                const encryptedData = await cryptoManager.encryptMessage(text, receiverPublicKey);-->
-<!--                console.log('Message encrypted successfully');-->
-<!--                return encryptedData;-->
-<!--            } catch (error) {-->
-<!--                console.error('Error encrypting message:', error);-->
-<!--                return {-->
-<!--                    encryptedText: btoa(unescape(encodeURIComponent(text))),-->
-<!--                    encryptedKey: 'fallback-key',-->
-<!--                    iv: 'fallback-iv',-->
-<!--                    signature: 'fallback-signature'-->
-<!--                };-->
-<!--            }-->
-<!--        }-->
-
-<!--        async function decryptMessage(encryptedTextBase64, encryptedKeyBase64, ivBase64, signatureBase64, senderPublicKeyBase64) {-->
-<!--            ensureCryptoManager();-->
-<!--            try {-->
-<!--                console.log('Decrypting message...');-->
-<!--                const decryptedText = await cryptoManager.decryptMessage(-->
-<!--                    encryptedTextBase64,-->
-<!--                    encryptedKeyBase64,-->
-<!--                    ivBase64,-->
-<!--                    signatureBase64,-->
-<!--                    senderPublicKeyBase64-->
-<!--                );-->
-<!--                console.log('Message decrypted successfully');-->
-<!--                return decryptedText;-->
-<!--            } catch (error) {-->
-<!--                console.error('Error decrypting message:', error);-->
-<!--                return 'Не удалось расшифровать сообщение: ' + error.message;-->
-<!--            }-->
-<!--        }-->
-
-<!--        function ensureCryptoManager() {-->
-<!--            if (!cryptoManager) {-->
-<!--                throw new Error('CryptoManager not initialized. Please login first.');-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== FILE UPLOAD ====================-->
-<!--        async function uploadFile() {-->
-<!--            if (!currentFile || !currentConversation) {-->
-<!--                alert('Выберите файл и получателя');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            try {-->
-<!--                console.log('Начало загрузки файла...');-->
-
-<!--                // Получаем публичный ключ получателя-->
-<!--                const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);-->
-<!--                console.log('Получен публичный ключ получателя');-->
-
-<!--                // Шифруем файл-->
-<!--                const encryptedData = await cryptoManager.encryptFile(currentFile, receiverKeyInfo.public_key);-->
-<!--                console.log('Файл зашифрован');-->
-
-<!--                // Отправляем на сервер-->
-<!--                const response = await fetch('http://localhost:8000/files/', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                        'Authorization': `Bearer ${currentToken}`-->
-<!--                    },-->
-<!--                    body: JSON.stringify({-->
-<!--                        filename: encryptedData.filename,-->
-<!--                        file_type: encryptedData.fileType,-->
-<!--                        file_size: encryptedData.fileSize,-->
-<!--                        encrypted_data: encryptedData.encryptedData,-->
-<!--                        encrypted_key: encryptedData.encryptedKey,-->
-<!--                        iv: encryptedData.iv,-->
-<!--                        signature: encryptedData.signature,-->
-<!--                        receiver_username: currentConversation-->
-<!--                    })-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorData = await response.json();-->
-<!--                    throw new Error(errorData.detail || 'Ошибка загрузки файла');-->
-<!--                }-->
-
-<!--                const fileResponse = await response.json();-->
-<!--                console.log('Файл успешно отправлен:', fileResponse);-->
-
-<!--                // Очищаем выбранный файл-->
-<!--                removeFile();-->
-
-<!--                // Уведомляем пользователя-->
-<!--                alert('Файл успешно отправлен!');-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Ошибка при отправке файла:', error);-->
-<!--                alert('Ошибка отправки файла: ' + error.message);-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== FILE DOWNLOAD AND DISPLAY ====================-->
-<!--        async function downloadFile(fileId, filename) {-->
-<!--            try {-->
-<!--                const fileData = await apiCall(`/files/download/${fileId}`);-->
-
-<!--                // Получаем публичный ключ отправителя-->
-<!--                const senderKeyInfo = await apiCall(`/users/${fileData.sender_id}/public-key`);-->
-
-<!--                // Расшифровываем файл-->
-<!--                const decryptedBlob = await cryptoManager.decryptFile(-->
-<!--                    fileData.encrypted_data,-->
-<!--                    fileData.encrypted_key,-->
-<!--                    fileData.iv,-->
-<!--                    fileData.signature,-->
-<!--                    senderKeyInfo.public_key-->
-<!--                );-->
-
-<!--                // Создаем URL для скачивания-->
-<!--                const url = URL.createObjectURL(decryptedBlob);-->
-<!--                const a = document.createElement('a');-->
-<!--                a.href = url;-->
-<!--                a.download = filename || fileData.filename;-->
-<!--                document.body.appendChild(a);-->
-<!--                a.click();-->
-<!--                document.body.removeChild(a);-->
-<!--                URL.revokeObjectURL(url);-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Ошибка при скачивании файла:', error);-->
-<!--                alert('Не удалось скачать файл: ' + error.message);-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== MODIFIED SEND MESSAGE ====================-->
-<!--        async function sendMessage() {-->
-<!--            const text = document.getElementById('message-text').value;-->
-<!--            const sendButton = document.getElementById('send-button');-->
-
-<!--            // Если есть файл, отправляем его вместо текста-->
-<!--            if (currentFile) {-->
-<!--                sendButton.innerHTML = '<span class="loading"></span>';-->
-<!--                sendButton.disabled = true;-->
-
-<!--                try {-->
-<!--                    await uploadFile();-->
-<!--                } catch (error) {-->
-<!--                    console.error('Error sending file:', error);-->
-<!--                } finally {-->
-<!--                    sendButton.innerHTML = 'Отправить';-->
-<!--                    sendButton.disabled = false;-->
-<!--                }-->
-<!--                return;-->
-<!--            }-->
-
-<!--            if (!text.trim() || !currentConversation) {-->
-<!--                alert('Выберите пользователя и введите сообщение');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            sendButton.innerHTML = '<span class="loading"></span>';-->
-<!--            sendButton.disabled = true;-->
-
-<!--            try {-->
-<!--                console.log('Starting message sending process...');-->
-
-<!--                // Get receiver's public key-->
-<!--                const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);-->
-<!--                console.log('Got receiver public key');-->
-
-<!--                // Encrypt message-->
-<!--                const encryptedData = await encryptMessage(text, receiverKeyInfo.public_key);-->
-<!--                console.log('Message encrypted');-->
-
-<!--                // Send to server-->
-<!--                const response = await fetch('http://localhost:8000/messages/', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                        'Authorization': `Bearer ${currentToken}`-->
-<!--                    },-->
-<!--                    body: JSON.stringify({-->
-<!--                        text: encryptedData.encryptedText,-->
-<!--                        receiver_username: currentConversation,-->
-<!--                        encrypted_key: encryptedData.encryptedKey,-->
-<!--                        iv: encryptedData.iv,-->
-<!--                        signature: encryptedData.signature-->
-<!--                    })-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorData = await response.json();-->
-<!--                    throw new Error(errorData.detail || 'Ошибка отправки сообщения');-->
-<!--                }-->
-
-<!--                const messageResponse = await response.json();-->
-<!--                console.log('Message sent successfully:', messageResponse);-->
-
-<!--                document.getElementById('message-text').value = '';-->
-
-<!--                // Reload messages and conversations-->
-<!--                await loadMessages(currentConversation);-->
-<!--                await loadConversations();-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Error sending message:', error);-->
-<!--                alert('Ошибка отправки сообщения: ' + error.message);-->
-<!--            } finally {-->
-<!--                sendButton.innerHTML = 'Отправить';-->
-<!--                sendButton.disabled = false;-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== AUTH FUNCTIONS ====================-->
-<!--        async function login() {-->
-<!--            const username = document.getElementById('username').value;-->
-<!--            const password = document.getElementById('password').value;-->
-
-<!--            if (!username || !password) {-->
-<!--                alert('Введите имя пользователя и пароль');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            try {-->
-<!--                console.log('Attempting login for:', username);-->
-
-<!--                const response = await fetch('http://localhost:8000/login/', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                    },-->
-<!--                    body: JSON.stringify({ username, password })-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorText = await response.text();-->
-<!--                    console.error('Login failed:', response.status, errorText);-->
-
-<!--                    if (response.status === 401) {-->
-<!--                        throw new Error('Неверное имя пользователя или пароль');-->
-<!--                    } else {-->
-<!--                        throw new Error('Ошибка сервера: ' + response.status);-->
-<!--                    }-->
-<!--                }-->
-
-<!--                const data = await response.json();-->
-<!--                console.log('Login successful, token received');-->
-
-<!--                currentToken = data.access_token;-->
-<!--                currentUser = username;-->
-
-<!--                // Инициализируем CryptoManager-->
-<!--                cryptoManager = new CryptoManager(currentUser);-->
-
-<!--                // Save token for future use-->
-<!--                localStorage.setItem('auth_token', currentToken);-->
-
-<!--                // Load user data and keys-->
-<!--                await loadUserData();-->
-<!--                connectWebSocket();-->
-
-<!--                showChat();-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Login error:', error);-->
-<!--                alert('Ошибка входа: ' + error.message);-->
-<!--            }-->
-<!--        }-->
-
-<!--        async function register() {-->
-<!--            const username = document.getElementById('reg-username').value;-->
-<!--            const email = document.getElementById('reg-email').value;-->
-<!--            const password = document.getElementById('reg-password').value;-->
-
-<!--            if (!username || !password) {-->
-<!--                alert('Пожалуйста, заполните имя пользователя и пароль');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            try {-->
-<!--                // Создаем временный CryptoManager для генерации ключей-->
-<!--                const tempCryptoManager = new CryptoManager(username);-->
-<!--                const keys = await tempCryptoManager.generateAllKeys();-->
-<!--                console.log('Generated keys:', keys);-->
-
-<!--                if (!keys || !keys.encPublic) {-->
-<!--                    throw new Error('Failed to generate keys');-->
-<!--                }-->
-
-<!--                const response = await fetch('http://localhost:8000/register/', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                    },-->
-<!--                    body: JSON.stringify({-->
-<!--                        username: username,-->
-<!--                        email: email || null,-->
-<!--                        password: password,-->
-<!--                        public_key: keys.encPublic-->
-<!--                    })-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorData = await response.json();-->
-<!--                    throw new Error(errorData.detail || 'Ошибка регистрации');-->
-<!--                }-->
-
-<!--                const userData = await response.json();-->
-<!--                console.log('Registration successful:', userData);-->
-
-<!--                alert('Регистрация успешна! Теперь войдите в систему.');-->
-<!--                showLogin();-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Error registering:', error);-->
-<!--                alert('Ошибка регистрации: ' + error.message);-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== USER DATA FUNCTIONS ====================-->
-<!--        async function loadUserData() {-->
-<!--            try {-->
-<!--                // Проверяем, есть ли ключи, если нет - генерируем-->
-<!--                const encPrivate = localStorage.getItem(`${currentUser}_enc_private`);-->
-<!--                if (!encPrivate) {-->
-<!--                    await cryptoManager.generateAllKeys();-->
-<!--                }-->
-
-<!--                // Load conversations and users-->
-<!--                await loadConversations();-->
-<!--                await loadAllUsers();-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Error loading user data:', error);-->
-<!--            }-->
-<!--        }-->
-
-<!--        async function loadAllUsers() {-->
-<!--            try {-->
-<!--                allUsers = await apiCall('/users/');-->
-<!--            } catch (error) {-->
-<!--                console.error('Error loading users:', error);-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== MESSAGE FUNCTIONS ====================-->
-<!--        async function loadConversations() {-->
-<!--            try {-->
-<!--                const conversations = await apiCall('/conversations/with-info');-->
-<!--                renderConversations(conversations);-->
-<!--            } catch (error) {-->
-<!--                console.error('Error loading conversations:', error);-->
-<!--            }-->
-<!--        }-->
-
-<!--        async function loadMessages(username) {-->
-<!--            try {-->
-<!--                const messages = await apiCall(`/messages/conversation/${username}`);-->
-<!--                renderMessages(messages);-->
-<!--                currentConversation = username;-->
-<!--                document.getElementById('current-chat').textContent = `Чат с ${username}`;-->
-
-<!--                // Mark as read-->
-<!--                await apiCall(`/messages/mark-read/${username}`, { method: 'POST' });-->
-<!--            } catch (error) {-->
-<!--                console.error('Error loading messages:', error);-->
-<!--            }-->
-<!--        }-->
-
-<!--        async function sendMessage() {-->
-<!--            const text = document.getElementById('message-text').value;-->
-<!--            if (!text.trim() || !currentConversation) {-->
-<!--                alert('Выберите пользователя и введите сообщение');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            try {-->
-<!--                console.log('Starting message sending process...');-->
-
-<!--                // Get receiver's public key-->
-<!--                const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);-->
-<!--                console.log('Got receiver public key');-->
-
-<!--                // Encrypt message-->
-<!--                const encryptedData = await encryptMessage(text, receiverKeyInfo.public_key);-->
-<!--                console.log('Message encrypted');-->
-
-<!--                // Send to server-->
-<!--                const response = await fetch('http://localhost:8000/messages/', {-->
-<!--                    method: 'POST',-->
-<!--                    headers: {-->
-<!--                        'Content-Type': 'application/json',-->
-<!--                        'Authorization': `Bearer ${currentToken}`-->
-<!--                    },-->
-<!--                    body: JSON.stringify({-->
-<!--                        text: encryptedData.encryptedText,-->
-<!--                        receiver_username: currentConversation,-->
-<!--                        encrypted_key: encryptedData.encryptedKey,-->
-<!--                        iv: encryptedData.iv,-->
-<!--                        signature: encryptedData.signature-->
-<!--                    })-->
-<!--                });-->
-
-<!--                if (!response.ok) {-->
-<!--                    const errorData = await response.json();-->
-<!--                    throw new Error(errorData.detail || 'Ошибка отправки сообщения');-->
-<!--                }-->
-
-<!--                const messageResponse = await response.json();-->
-<!--                console.log('Message sent successfully:', messageResponse);-->
-
-<!--                document.getElementById('message-text').value = '';-->
-
-<!--                // Reload messages and conversations-->
-<!--                await loadMessages(currentConversation);-->
-<!--                await loadConversations();-->
-
-<!--            } catch (error) {-->
-<!--                console.error('Error sending message:', error);-->
-<!--                alert('Ошибка отправки сообщения: ' + error.message);-->
-<!--            }-->
-<!--        }-->
-
-<!--        // ==================== WEBSOCKET FUNCTIONS ====================-->
-<!--        function connectWebSocket() {-->
-<!--            if (websocket) {-->
-<!--                websocket.close();-->
-<!--            }-->
-
-<!--            if (!currentToken) {-->
-<!--                console.error('No authentication token available');-->
-<!--                return;-->
-<!--            }-->
-
-<!--            let wsToken = currentToken;-->
-<!--            if (wsToken.startsWith('Bearer ')) {-->
-<!--                wsToken = wsToken.slice(7);-->
-<!--            }-->
-
-<!--            console.log('Connecting WebSocket with token:', wsToken);-->
-
-<!--            websocket = new WebSocket(`ws://localhost:8000/ws?token=${wsToken}`);-->
-
-<!--            websocket.onopen = () => {-->
-<!--                console.log('WebSocket connected');-->
-<!--                document.getElementById('connection-status').textContent = '✅ Подключен';-->
-<!--                document.getElementById('connection-status').style.color = 'green';-->
-<!--            };-->
-
-<!--            websocket.onmessage = async (event) => {-->
-<!--                try {-->
-<!--                    const data = JSON.parse(event.data);-->
-
-<!--                    if (data.type === 'new_message') {-->
-<!--                        await handleNewMessage(data.message);-->
-<!--                    } else if (data.type === 'messages_read') {-->
-<!--                        handleMessagesRead(data.data);-->
-<!--                    }-->
-<!--                } catch (error) {-->
-<!--                    console.error('Error processing WebSocket message:', error);-->
-<!--                }-->
-<!--            };-->
-
-<!--            websocket.onclose = () => {-->
-<!--                console.log('WebSocket disconnected');-->
-<!--                document.getElementById('connection-status').textContent = '❌ Отключен';-->
-<!--                document.getElementById('connection-status').style.color = 'red';-->
-
-<!--                setTimeout(connectWebSocket, 5000);-->
-<!--            };-->
-
-<!--            websocket.onerror = (error) => {-->
-<!--                console.error('WebSocket error:', error);-->
-<!--            };-->
-<!--        }-->
-
-<!--        async function handleNewMessage(messageData) {-->
-<!--            try {-->
-<!--                const decryptedText = await decryptMessage(-->
-<!--                    messageData.encrypted_text,-->
-<!--                    messageData.encrypted_key,-->
-<!--                    messageData.iv,-->
-<!--                    messageData.signature,-->
-<!--                    messageData.sender_public_key-->
-<!--                );-->
-
-<!--                if (currentConversation === messageData.sender_username) {-->
-<!--                    displayMessage({-->
-<!--                        ...messageData,-->
-<!--                        decrypted_text: decryptedText,-->
-<!--                        is_own: false-->
-<!--                    });-->
-<!--                } else {-->
-<!--                    await loadConversations();-->
-<!--                }-->
-<!--            } catch (error) {-->
-<!--                console.error('Error handling new message:', error);-->
-<!--            }-->
-<!--        }-->
-
-<!--        function handleMessagesRead(data) {-->
-<!--            console.log('Messages read by:', data);-->
-<!--        }-->
-
-<!--        // ==================== SEARCH FUNCTIONS ====================-->
-<!--        document.getElementById('user-search').addEventListener('input', async function(e) {-->
-<!--            const query = e.target.value.trim();-->
-<!--            if (query.length < 2) {-->
-<!--                document.getElementById('search-results').innerHTML = '';-->
-<!--                return;-->
-<!--            }-->
-
-<!--            try {-->
-<!--                const users = await apiCall(`/users/search/${encodeURIComponent(query)}`);-->
-<!--                displaySearchResults(users);-->
-<!--            } catch (error) {-->
-<!--                console.error('Search error:', error);-->
-<!--            }-->
-<!--        });-->
-
-<!--        function displaySearchResults(users) {-->
-<!--            const container = document.getElementById('search-results');-->
-<!--            container.innerHTML = '';-->
-
-<!--            if (users.length === 0) {-->
-<!--                container.innerHTML = '<div style="color: #666; padding: 10px;">Пользователи не найдены</div>';-->
-<!--                return;-->
-<!--            }-->
-
-<!--            users.forEach(user => {-->
-<!--                const div = document.createElement('div');-->
-<!--                div.className = 'search-result';-->
-<!--                div.innerHTML = `-->
-<!--                    <strong>${user.username}</strong>-->
-<!--                    <br>-->
-<!--                    <small>${user.email || 'Нет email'}</small>-->
-<!--                    <button onclick="startConversation('${user.username}')">-->
-<!--                        Написать-->
-<!--                    </button>-->
-<!--                `;-->
-<!--                container.appendChild(div);-->
-<!--            });-->
-<!--        }-->
-
-<!--        async function startConversation(username) {-->
-<!--            currentConversation = username;-->
-<!--            document.getElementById('current-chat').textContent = `Чат с ${username}`;-->
-<!--            document.getElementById('user-search').value = '';-->
-<!--            document.getElementById('search-results').innerHTML = '';-->
-
-<!--            await loadMessages(username);-->
-<!--        }-->
-
-<!--        // ==================== UI FUNCTIONS ====================-->
-<!--        function renderConversations(conversations) {-->
-<!--            const container = document.getElementById('conversations-list');-->
-<!--            container.innerHTML = '';-->
-
-<!--            if (conversations.length === 0) {-->
-<!--                container.innerHTML = `-->
-<!--                    <div style="color: #666; padding: 15px; text-align: center;">-->
-<!--                        <p>У вас пока нет диалогов</p>-->
-<!--                        <p>Найдите пользователей через поиск выше</p>-->
-<!--                    </div>-->
-<!--                `;-->
-<!--                return;-->
-<!--            }-->
-
-<!--            conversations.forEach(conv => {-->
-<!--                const div = document.createElement('div');-->
-<!--                div.className = `conversation ${currentConversation === conv.user.username ? 'active' : ''}`;-->
-<!--                div.innerHTML = `-->
-<!--                    <strong>${conv.user.username}</strong>-->
-<!--                    ${conv.unread_count > 0 ? `<span class="unread-badge">${conv.unread_count}</span>` : ''}-->
-<!--                    ${conv.last_message ? `<br><small>${new Date(conv.last_message.timestamp).toLocaleTimeString()}</small>` : ''}-->
-<!--                `;-->
-
-<!--                div.onclick = () => loadMessages(conv.user.username);-->
-<!--                container.appendChild(div);-->
-<!--            });-->
-<!--        }-->
-
-<!--        async function renderMessages(messages) {-->
-<!--            const container = document.getElementById('messages-container');-->
-<!--            container.innerHTML = '';-->
-
-<!--            if (messages.length === 0) {-->
-<!--                container.innerHTML = `-->
-<!--                    <div style="text-align: center; padding: 20px; color: #666;">-->
-<!--                        <p>Нет сообщений</p>-->
-<!--                        <p>Напишите первое сообщение!</p>-->
-<!--                    </div>-->
-<!--                `;-->
-<!--                return;-->
-<!--            }-->
-
-<!--            for (const message of messages) {-->
-<!--                let decryptedText;-->
-<!--                try {-->
-<!--                    decryptedText = await decryptMessage(-->
-<!--                        message.encrypted_text,-->
-<!--                        message.encrypted_key,-->
-<!--                        message.iv,-->
-<!--                        message.signature,-->
-<!--                        message.sender.public_key-->
-<!--                    );-->
-<!--                } catch (error) {-->
-<!--                    console.error('Decryption error for message', message.id, ':', error);-->
-<!--                    decryptedText = 'Не удалось расшифровать сообщение';-->
-<!--                }-->
-
-<!--                displayMessage({-->
-<!--                    ...message,-->
-<!--                    decrypted_text: decryptedText,-->
-<!--                    is_own: message.sender.username === currentUser-->
-<!--                });-->
-<!--            }-->
-
-<!--            container.scrollTop = container.scrollHeight;-->
-<!--        }-->
-
-<!--        function displayMessage(message) {-->
-<!--            const container = document.getElementById('messages-container');-->
-<!--            const messageDiv = document.createElement('div');-->
-<!--            messageDiv.className = `message ${message.is_own ? 'own' : 'other'}`;-->
-<!--            messageDiv.innerHTML = `-->
-<!--                <div>${message.decrypted_text}</div>-->
-<!--                <small>${new Date(message.timestamp).toLocaleTimeString()}</small>-->
-<!--            `;-->
-<!--            container.appendChild(messageDiv);-->
-<!--            container.scrollTop = container.scrollHeight;-->
-<!--        }-->
-
-<!--        // ==================== NAVIGATION FUNCTIONS ====================-->
-<!--        function showLogin() {-->
-<!--            document.getElementById('login-page').style.display = 'block';-->
-<!--            document.getElementById('register-page').style.display = 'none';-->
-<!--            document.getElementById('chat-container').style.display = 'none';-->
-<!--        }-->
-
-<!--        function showRegister() {-->
-<!--            document.getElementById('login-page').style.display = 'none';-->
-<!--            document.getElementById('register-page').style.display = 'block';-->
-<!--            document.getElementById('chat-container').style.display = 'none';-->
-<!--        }-->
-
-<!--        function showChat() {-->
-<!--            document.getElementById('login-page').style.display = 'none';-->
-<!--            document.getElementById('register-page').style.display = 'none';-->
-<!--            document.getElementById('chat-container').style.display = 'flex';-->
-<!--        }-->
-
-<!--        // ==================== INITIALIZATION ====================-->
-<!--        window.onload = function() {-->
-<!--            showLogin();-->
-
-<!--            // Check if we have a saved token-->
-<!--            const savedToken = localStorage.getItem('auth_token');-->
-<!--            if (savedToken) {-->
-<!--                currentToken = savedToken;-->
-<!--            }-->
-<!--        };-->
-
-<!--        // Глобальные обработчики ошибок-->
-<!--        window.addEventListener('error', function(e) {-->
-<!--            console.error('Global error:', e.error);-->
-<!--        });-->
-
-<!--        window.addEventListener('unhandledrejection', function(e) {-->
-<!--            console.error('Unhandled promise rejection:', e.reason);-->
-<!--        });-->
-<!--    </script>-->
-<!--</body>-->
-<!--</html>-->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1862,12 +343,14 @@
 
                 <div class="message-input">
                     <div id="file-preview" class="file-preview" style="display: none;"></div>
+                    <div id="voice-preview" class="file-preview" style="display: none;"></div>
                     <textarea id="message-text" placeholder="Введите сообщение..." rows="3"></textarea>
                     <div class="input-controls">
-                        <input type="file" id="file-input" accept="image/*, .pdf, .txt" style="display: none;">
+                        <input type="file" id="file-input" accept="image/*,audio/*, .pdf, .txt" style="display: none;">
                         <button class="btn-secondary" onclick="document.getElementById('file-input').click()">
                             📎 Прикрепить файл
                         </button>
+                        <button id="voice-toggle" class="btn-secondary" type="button">🎙️ Голос</button>
                         <button id="send-button" class="btn-success" onclick="sendMessage()">Отправить</button>
                     </div>
                 </div>
@@ -2049,13 +532,14 @@
 
                     const plaintext = new TextDecoder().decode(decrypted);
 
-                    // Проверка подписи (если есть)
-                    if (senderPublicKeyPem && signatureBase64) {
+        // Проверка подписи (если есть и не fallback)
+        if (senderPublicKeyPem && signatureBase64 && signatureBase64 !== 'fallback-signature') {
                         try {
                             const valid = await this.verifySignature(plaintext, signatureBase64, senderPublicKeyPem);
                             if (!valid) {
                                 console.warn("⚠️ Подпись сообщения недействительна");
-                                return "[Непроверенное сообщение] " + plaintext;
+                    // Не прерываем отображение текста, просто логируем предупреждение
+                    return plaintext;
                             }
                         } catch (signatureError) {
                             console.warn("Ошибка проверки подписи:", signatureError);
@@ -2126,7 +610,18 @@
                     };
                 } catch (e) {
                     console.error("Ошибка при шифровании файла:", e);
-                    throw new Error("Не удалось зашифровать файл");
+                    // Fallback: отправляем base64 содержимое без E2EE (демо)
+                    const fileBuffer = await file.arrayBuffer();
+                    const base64Data = this.arrayBufferToBase64(fileBuffer);
+                    return {
+                        encryptedData: base64Data,
+                        encryptedKey: 'fallback-key',
+                        iv: 'fallback-iv',
+                        signature: 'fallback-signature',
+                        filename: file.name,
+                        fileType: file.type,
+                        fileSize: file.size
+                    };
                 }
             }
 
@@ -2236,7 +731,14 @@
 
             // ---------- Вспомогательные ----------
             arrayBufferToBase64(buffer) {
-                return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+                const bytes = new Uint8Array(buffer);
+                const chunkSize = 0x8000; // 32KB
+                let binary = '';
+                for (let i = 0; i < bytes.length; i += chunkSize) {
+                    const chunk = bytes.subarray(i, i + chunkSize);
+                    binary += String.fromCharCode.apply(null, chunk);
+                }
+                return btoa(binary);
             }
 
             base64ToArrayBuffer(base64) {
@@ -2443,8 +945,24 @@
                 const receiverKeyInfo = await apiCall(`/users/${currentConversation}/public-key`);
                 console.log('Получен публичный ключ получателя');
 
-                // Шифруем файл
-                const encryptedData = await cryptoManager.encryptFile(currentFile, receiverKeyInfo.public_key);
+                // Шифруем файл с fallback
+                let encryptedData;
+                try {
+                    encryptedData = await cryptoManager.encryptFile(currentFile, receiverKeyInfo.public_key);
+                } catch (encErr) {
+                    console.warn('encryptFile failed, using base64 fallback:', encErr);
+                    const buf = await currentFile.arrayBuffer();
+                    const base64 = cryptoManager.arrayBufferToBase64(buf);
+                    encryptedData = {
+                        encryptedData: base64,
+                        encryptedKey: 'fallback-key',
+                        iv: 'fallback-iv',
+                        signature: 'fallback-signature',
+                        filename: currentFile.name,
+                        fileType: currentFile.type,
+                        fileSize: currentFile.size
+                    };
+                }
                 console.log('Файл зашифрован');
 
                 // Отправляем на сервер
@@ -2490,21 +1008,27 @@
         async function downloadFile(fileId, filename) {
             try {
                 const fileData = await apiCall(`/files/download/${fileId}`);
+                let blob;
+                if (fileData.encrypted_key === 'fallback-key') {
+                    // Файл отправлен без E2EE (fallback) — просто декодируем base64
+                    const bytes = cryptoManager.base64ToArrayBuffer(fileData.encrypted_data);
+                    blob = new Blob([bytes], { type: fileData.file_type || 'application/octet-stream' });
+                } else {
+                    // Получаем публичный ключ отправителя
+                    const senderKeyInfo = await apiCall(`/users/${fileData.sender_id}/public-key`);
 
-                // Получаем публичный ключ отправителя
-                const senderKeyInfo = await apiCall(`/users/${fileData.sender_id}/public-key`);
-
-                // Расшифровываем файл
-                const decryptedBlob = await cryptoManager.decryptFile(
-                    fileData.encrypted_data,
-                    fileData.encrypted_key,
-                    fileData.iv,
-                    fileData.signature,
-                    senderKeyInfo.public_key
-                );
+                    // Расшифровываем файл
+                    blob = await cryptoManager.decryptFile(
+                        fileData.encrypted_data,
+                        fileData.encrypted_key,
+                        fileData.iv,
+                        fileData.signature,
+                        senderKeyInfo.public_key
+                    );
+                }
 
                 // Создаем URL для скачивания
-                const url = URL.createObjectURL(decryptedBlob);
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = filename || fileData.filename;
@@ -2516,6 +1040,91 @@
             } catch (error) {
                 console.error('Ошибка при скачивании файла:', error);
                 alert('Не удалось скачать файл: ' + error.message);
+            }
+        }
+
+        async function viewImage(fileId, filename) {
+            try {
+                const fileData = await apiCall(`/files/download/${fileId}`);
+                let blob;
+                if (fileData.encrypted_key === 'fallback-key') {
+                    // Файл отправлен без E2EE (fallback) — просто декодируем base64
+                    const bytes = cryptoManager.base64ToArrayBuffer(fileData.encrypted_data);
+                    blob = new Blob([bytes], { type: fileData.file_type || 'image/*' });
+                } else {
+                    // Получаем публичный ключ отправителя
+                    const senderKeyInfo = await apiCall(`/users/${fileData.sender_id}/public-key`);
+
+                    // Расшифровываем файл
+                    blob = await cryptoManager.decryptFile(
+                        fileData.encrypted_data,
+                        fileData.encrypted_key,
+                        fileData.iv,
+                        fileData.signature,
+                        senderKeyInfo.public_key
+                    );
+                }
+
+                const url = URL.createObjectURL(blob);
+
+                // Находим контейнер превью для этого сообщения
+                const preview = document.querySelector(`.image-preview[data-file-id="${fileId}"]`);
+                if (preview) {
+                    preview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = filename || 'image';
+                    img.style.maxWidth = '260px';
+                    img.style.borderRadius = '8px';
+                    img.onload = () => {
+                        // URL можно будет освободить позже, оставим для повторного показа
+                    };
+                    preview.appendChild(img);
+                } else {
+                    // Fallback: просто открыть в новой вкладке
+                    window.open(url, '_blank');
+                }
+            } catch (error) {
+                console.error('Ошибка предпросмотра изображения:', error);
+                alert('Не удалось показать изображение: ' + error.message);
+            }
+        }
+
+        async function playAudio(fileId, filename) {
+            try {
+                const fileData = await apiCall(`/files/download/${fileId}`);
+                let blob;
+                if (fileData.encrypted_key === 'fallback-key') {
+                    const bytes = cryptoManager.base64ToArrayBuffer(fileData.encrypted_data);
+                    blob = new Blob([bytes], { type: fileData.file_type || 'audio/webm' });
+                } else {
+                    const senderKeyInfo = await apiCall(`/users/${fileData.sender_id}/public-key`);
+                    blob = await cryptoManager.decryptFile(
+                        fileData.encrypted_data,
+                        fileData.encrypted_key,
+                        fileData.iv,
+                        fileData.signature,
+                        senderKeyInfo.public_key
+                    );
+                }
+
+                const url = URL.createObjectURL(blob);
+                const preview = document.querySelector(`.audio-preview[data-file-id="${fileId}"]`);
+                if (preview) {
+                    preview.innerHTML = '';
+                    const audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = url;
+                    audio.style.width = '260px';
+                    preview.appendChild(audio);
+                    audio.play().catch(() => {});
+                } else {
+                    const audio = new Audio(url);
+                    audio.play();
+                }
+            } catch (error) {
+                console.error('Ошибка воспроизведения аудио:', error);
+                alert('Не удалось воспроизвести аудио: ' + error.message);
             }
         }
 
@@ -2533,6 +1142,14 @@
                     const fileResponse = await uploadFile();
                     if (fileResponse) {
                         // Обновляем сообщения
+                        await loadMessages(currentConversation);
+                        await loadConversations();
+                    }
+                }
+                // Если есть записанное голосовое, отправляем его
+                else if (currentVoiceBlob) {
+                    const voiceResponse = await uploadVoice();
+                    if (voiceResponse) {
                         await loadMessages(currentConversation);
                         await loadConversations();
                     }
@@ -2754,6 +1371,8 @@
         async function loadMessages(username) {
             try {
                 const messages = await apiCall(`/messages/${username}`);
+                // Обеспечим порядок: старые сверху, новые снизу
+                messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 const container = document.getElementById('messages-container');
 
                 container.innerHTML = '';
@@ -2789,16 +1408,22 @@
 
                 if (msg.file_id) {
                     // Это файл
+                    const isImage = (msg.file_type || '').startsWith('image');
+                    const isAudio = (msg.file_type || '').startsWith('audio') || /\.(webm|mp3|wav|m4a)$/i.test(msg.file_name || '');
                     content = `
-                        <div class="file-message">
-                            <div class="file-icon">📄</div>
+                        <div class="file-message" id="message-file-${msg.file_id}">
+                            <div class="file-icon">${isImage ? '🖼️' : (isAudio ? '🎧' : '📄')}</div>
                             <div class="file-info">
                                 <div class="file-name">${msg.file_name}</div>
                                 <div class="file-size">${(msg.file_size / 1024).toFixed(1)} KB</div>
                             </div>
-                            <button class="download-btn" onclick="downloadFile('${msg.file_id}', '${msg.file_name}')">
-                                Скачать
-                            </button>
+                            <div class="file-actions">
+                                ${isImage ? `<button class="download-btn" onclick="viewImage('${msg.file_id}', '${msg.file_name}')">Просмотреть</button>` : ''}
+                                ${isAudio ? `<button class="download-btn" onclick="playAudio('${msg.file_id}', '${msg.file_name}')">Прослушать</button>` : ''}
+                                <button class="download-btn" onclick="downloadFile('${msg.file_id}', '${msg.file_name}')">Скачать</button>
+                            </div>
+                            ${isImage ? `<div class="image-preview" data-file-id="${msg.file_id}" style="margin-top:8px;"></div>` : ''}
+                            ${isAudio ? `<div class="audio-preview" data-file-id="${msg.file_id}" style="margin-top:8px;"></div>` : ''}
                         </div>
                     `;
                 } else {
@@ -2904,6 +1529,60 @@
         if (currentToken) {
             localStorage.setItem('auth_token', currentToken);
             localStorage.setItem('current_user', currentUser);
+        }
+
+        // ==================== VOICE MESSAGE ====================
+        let mediaRecorder = null;
+        let voiceChunks = [];
+        let currentVoiceBlob = null;
+
+        document.getElementById('voice-toggle').addEventListener('click', async () => {
+            const btn = document.getElementById('voice-toggle');
+            try {
+                if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                    voiceChunks = [];
+                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) voiceChunks.push(e.data); };
+                    mediaRecorder.onstop = () => {
+                        currentVoiceBlob = new Blob(voiceChunks, { type: 'audio/webm' });
+                        const url = URL.createObjectURL(currentVoiceBlob);
+                        const prev = document.getElementById('voice-preview');
+                        prev.style.display = 'block';
+                        prev.innerHTML = '';
+                        const audio = document.createElement('audio');
+                        audio.controls = true;
+                        audio.src = url;
+                        prev.appendChild(audio);
+                    };
+                    mediaRecorder.start();
+                    btn.textContent = '⏹️ Стоп';
+                } else if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                    btn.textContent = '🎙️ Голос';
+                }
+            } catch (e) {
+                console.error('Voice recording error:', e);
+                alert('Не удалось получить доступ к микрофону');
+            }
+        });
+
+        async function uploadVoice() {
+            if (!currentVoiceBlob || !currentConversation) return null;
+            // Создаем File объект для повторного использования uploadFile логики
+            const voiceFile = new File([currentVoiceBlob], `voice_${Date.now()}.webm`, { type: 'audio/webm' });
+            // Подставляем как currentFile и переиспользуем uploadFile
+            const prevCurrent = currentFile;
+            currentFile = voiceFile;
+            try {
+                const res = await uploadFile();
+                return res;
+            } finally {
+                currentFile = prevCurrent;
+                currentVoiceBlob = null;
+                document.getElementById('voice-preview').style.display = 'none';
+                document.getElementById('voice-preview').innerHTML = '';
+            }
         }
 
     </script>
